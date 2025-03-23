@@ -27,6 +27,7 @@ app.get("/download", async (req, res) => {
   res.status(200);
   res.header("Content-Type", "application/vnd.android.package-archive");
   res.header("Content-Disposition", "attachment; filename=grindr.apk");
+  res.header("Content-Length", fetchResponse.headers.get("Content-Length") as string)
 
   fetchResponse.body.pipe(res);
 });
