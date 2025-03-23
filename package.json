@@ -2,7 +2,7 @@
   "name": "apkmirrormirror",
   "module": "index.ts",
   "type": "module",
-  "packageManager": "bun@*",
+  "packageManager": "bun@1.2.5",
   "scripts": {
     "start": "bun run index.ts"
   },
