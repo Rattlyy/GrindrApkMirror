@@ -1,5 +1,6 @@
 import express from "express";
 import fetch from "node-fetch";
+import { existsSync, createWriteStream } from "fs";
 import { getFinalDownloadUrl } from "./mirror-dl";
 const app = express();
 
@@ -18,19 +19,19 @@ app.get("/download", async (req, res) => {
     return;
   }
 
-  const fetchResponse = await fetch(await getFinalDownloadUrl(finalDlUrl));
-  if (fetchResponse.body === null) {
-    res.status(404).send("Not found");
+  if (existsSync(`./cache/${ver}.apkx`)) {
+    res.download(`./cache/${ver}.apkx`);
     return;
+  } else {
+    const fetchResponse = await fetch(await getFinalDownloadUrl(finalDlUrl));
+    if (fetchResponse.body === null) {
+      res.status(404).send("Not found");
+      return;
+    }
+
+    fetchResponse.body.pipe(createWriteStream(`./cache/${ver}.apkx`));
+    res.download(`./cache/${ver}.apkx`);
   }
-
-  res.status(200);
-  res.header("Content-Type", "application/vnd.android.package-archive");
-  res.header("Content-Disposition", "attachment; filename=grindr.apk");
-  res.header("ETag", ver as string);
-  res.header("content-length", fetchResponse.headers.get("content-length")!);
-
-  fetchResponse.body.pipe(res);
 });
 
 app.listen(3000, () => {
